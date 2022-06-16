@@ -17,7 +17,7 @@ final class WC_Gateway_FAWATERAK_Blocks_Support extends AbstractPaymentMethodTyp
 	 * Initializes the payment method type.
 	 */
 	public function initialize() {
-		$this->settings = get_option( 'woocommerce_fawaterak_settings', [] );
+		$this->settings = get_option('fawaterk_plugin_options', [] );
 	}
 
 	/**

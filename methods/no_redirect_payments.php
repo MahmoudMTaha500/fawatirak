@@ -12,7 +12,7 @@ class WC_Gateway_Fawaterk_NO_Redirect_Payments extends WC_Payment_Gateway
         $this->method_public_description = __('Pay with ' . $title);
         $this->supports           = ['products'];
         $this->payment_method_id   = $id;
-
+        $this->fawaterk_wallet_number = '01118389502';
 
 
         $this->init_form_fields();
@@ -41,13 +41,13 @@ class WC_Gateway_Fawaterk_NO_Redirect_Payments extends WC_Payment_Gateway
         (function_exists("wc_get_order")) ? $order = wc_get_order($order_id) : $order = new WC_Order($order_id);
 
         $config = [
-            "api_key" => get_option('woocommerce_fawaterak_settings')['private_key'],
+            "api_key" => get_option('fawaterk_plugin_options')['private_key'],
             "payment_method_id" => $this->payment_method_id,
         ];
 
-        $return_url = WC_Payment_Gateway::get_return_url( $order );
-        $process = new FawaterkPayHelper($order, $config, $return_url);
-        
+        $return_url = WC_Payment_Gateway::get_return_url($order);
+        $process = new FawaterkPayHelper($order, $config, $return_url, $order);
+
         if (!$process->isValid()) {
             throw new Exception("Please solve all the errors below.");
         }

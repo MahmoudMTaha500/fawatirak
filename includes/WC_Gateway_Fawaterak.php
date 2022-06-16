@@ -12,7 +12,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
         $this->title = __('Fawaterak', 'fawaterak');
 
         $this->icon = WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/paywf.png'; // URL of the icon that will be displayed on checkout page near your gateway name
-        // Bool. Can be set to true if you want payment fields to show on the checkout 
+        // Bool. Can be set to true if you want payment fields to show on the checkout
         // if doing a direct integration, which we are doing in this case
         $this->has_fields = true;
 
@@ -21,7 +21,16 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
         $this->method_title = __('Fawterak Gateway', 'fawaterak');
 
-        $this->method_description = __('Fawterak payment gateway', 'fawaterak');
+        /**
+         * Moved settings page message
+         */
+        $settings_hint_text  = get_locale() === 'ar' ? esc_html__('تم نقل صفحة الإعدادات إلى ', 'fawaterk') : esc_html__('Settings page has been moved to ', 'fawaterk');
+        $settings_page_url = get_admin_url() . '/admin.php?page=fawaterk_settings';
+        $settings_page_url_text = get_locale() === 'ar' ? esc_html__('هنا', 'fawaterk') : esc_html__('here', 'fawaterk');
+
+        $settings_hint = wp_sprintf('<a class="button-secondary" href="%2$s">%1$s  %3$s</a>', $settings_hint_text, $settings_page_url, $settings_page_url_text);
+
+        $this->method_description = $settings_hint;
 
         // gateways can support subscriptions, refunds, saved payment methods,
         $this->supports = array(
@@ -56,48 +65,68 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
         add_action('woocommerce_api_fawaterak_webhook', array($this, 'webhook'));
     }
 
+
     /**
      * Plugin options
      */
     public function init_form_fields()
     {
-
-        $this->form_fields = array(
-            'enabled'               => array(
-                'title'   => __('Enable/Disable', 'woocommerce'),
-                'type'    => 'checkbox',
-                'label'   => __('Enable Fawaterak', 'woocommerce'),
-                'default' => 'no',
-            ),
-            'title'                 => array(
-                'title'       => __('Title', 'woocommerce'),
-                'type'        => 'text',
-                'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
-                'default'     => __('Fawaterak', 'woocommerce'),
-                'desc_tip'    => true,
-            ),
-            'description'           => array(
-                'title'       => __('Description', 'woocommerce'),
-                'type'        => 'text',
-                'desc_tip'    => true,
-                'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
-                'default'     => __("Pay via Fawaterak: You can pay with Credit/Debit cards or via Fawry and mobile wallets.", 'woocommerce'),
-            ),
-            'private_key'           => array(
-                'title'       => __('API credentials', 'woocommerce'),
-                'type'        => 'text',
-                'description' =>  __('Enter your Fawaterak API credentials to process payments via Fawaterak.'),
-            ),
-            'webhook_url'           => array(
-                'title'       => __('WebHook Url', 'woocommerce'),
-                'type'        => 'text',
-                'description' =>  __('Copy This to the redirect url field at Fawaterak Website'),
-                'default' => get_site_url() . '/wc-api/fawaterak_webhook',
-                'custom_attributes' => array('readonly' => 'readonly'),
-            ),
-        );
+        if (strpos(http_build_query($_GET), 'page=wc-settings&tab=checkout&section=fawaterak') !== false) {
+            add_action('admin_head', function () {
+                echo '<style>p.submit {display: none;}</style>';
+            });
+            wp_redirect(get_admin_url() . '/admin.php?page=fawaterk_settings');
+        }
+        // Commented to enable custom settings page
+        // $this->form_fields = array(
+        //     'enabled'               => array(
+        //         'title'   => __('Enable/Disable', 'woocommerce'),
+        //         'type'    => 'checkbox',
+        //         'label'   => __('Enable Fawaterak', 'woocommerce'),
+        //         'default' => 'no',
+        //     ),
+        //     'title'                 => array(
+        //         'title'       => __('Title', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
+        //         'default'     => __('Fawaterak', 'woocommerce'),
+        //         'desc_tip'    => true,
+        //     ),
+        //     'description'           => array(
+        //         'title'       => __('Description', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'desc_tip'    => true,
+        //         'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
+        //         'default'     => __("Pay via Fawaterak: You can pay with Credit/Debit cards or via Fawry and mobile wallets.", 'woocommerce'),
+        //     ),
+        //     'mobile_wallet_title'                 => array(
+        //         'title'       => __('Mobile Wallet Title English', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'description' => __('This controls mobile wallet payment title which the user sees during checkout.', 'woocommerce'),
+        //         'default'     => __('Mobile Wallet', 'woocommerce'),
+        //         'desc_tip'    => true,
+        //     ),
+        //     'fawry_title'                 => array(
+        //         'title'       => __('Fawry Title English', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'description' => __('This controls mobile wallet payment title which the user sees during checkout.', 'woocommerce'),
+        //         'default'     => __('Fawry', 'woocommerce'),
+        //         'desc_tip'    => true,
+        //     ),
+        //     'private_key'           => array(
+        //         'title'       => __('API credentials', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'description' =>  __('Enter your Fawaterak API credentials to process payments via Fawaterak.'),
+        //     ),
+        //     'webhook_url'           => array(
+        //         'title'       => __('WebHook Url', 'woocommerce'),
+        //         'type'        => 'text',
+        //         'description' =>  __('Copy This to the redirect url field at Fawaterak Website'),
+        //         'default' => get_site_url() . '/wc-api/fawaterak_webhook',
+        //         'custom_attributes' => array('readonly' => 'readonly'),
+        //     ),
+        // );
     }
-
     /*
     * Fields validation
     */
@@ -152,15 +181,20 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
             }
         }
 
+
+        // Get mobile wallet number field
+        $mobile_wallet_number = intval(get_post_meta($order->id, '_fawaterk_wallet_number', true)) != '' ? intval(get_post_meta($order->id, '_fawaterk_wallet_number', true)) : intval($order->get_billing_phone());
+
         $payload = array(
-            "vendorKey" => get_option('woocommerce_fawaterak_settings')['private_key'],
+            "vendorKey" => get_option('fawaterk_plugin_options')['private_key'],
             "currency" => get_woocommerce_currency(),
             "cartTotal" => floatval($order->get_total()),
             "customer" => [
                 'first_name' => $order->get_billing_first_name(),
                 "last_name" => $order->get_billing_last_name(),
                 "email" => $order->get_billing_email(),
-                "phone" => intval($order->get_billing_phone()),
+                // "phone" => intval($order->get_billing_phone()),
+                "phone" => $mobile_wallet_number,
                 "address" => $order->get_billing_address_1() ? $order->get_billing_address_1() :  'none'
             ],
 
@@ -260,7 +294,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
         global $wpdb, $woocommerce;
 
         try {
-            $vendor_key = get_option('woocommerce_fawaterak_settings')['private_key'];
+            $vendor_key = get_option('fawaterk_plugin_options')['private_key'];
 
             if (!isset($_POST['api_key']) | $_POST['api_key'] != $vendor_key)
                 throw new \Exception('Invalid api key', 401);
@@ -288,8 +322,8 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
             $orderMeta = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}postmeta WHERE meta_key='invoice_key' AND  meta_value = '" . $invoice_key . "' limit 1");
 
-            
-           
+
+
 
             if (count($orderMeta) == 0)
                 throw new \Exception('Invalid invoice key', 400);

@@ -26,6 +26,7 @@ function fawaterak_init_gateway_class()
     if (!class_exists('WC_Payment_Gateway')) return;
     include_once 'helpers/fawaterk-admin-helper.php';
     include_once 'helpers/fawaterk-pay-helper.php';
+    include_once 'helpers/fawaterk-admin-page.php';
 
     // If we made it this far, then include our Gateway Class
     include_once('includes/WC_Gateway_Fawaterak.php');
@@ -74,7 +75,7 @@ add_filter('woocommerce_thankyou_order_received_text', 'woocommerce_fawaterk_mod
 function woocommerce_fawaterk_modify_thank_you_text($str, $order)
 {
     $payment_data =  get_post_meta($order->get_id(), 'payment_data', true);
-    // This will give us the payment method id 
+    // This will give us the payment method id
     $payment_method_id =  $order->get_payment_method();
 
     $new_str = '';
@@ -104,8 +105,12 @@ function custom_available_payment_gateways($available_gateways)
         return $available_gateways;
     }
 
-    $response = wp_remote_get(' https://app.fawaterk.com/api/v2/getPaymentmethods', array('headers' => array('Authorization' => 'Bearer ' . get_option('woocommerce_fawaterak_settings')['private_key'], 'content-type' => 'application/json')));
+    $fawaterk_settings = get_option('fawaterk_plugin_options');
+    $fawaterk_api_key = $fawaterk_settings['private_key'];
+    $fawry_title = isset($fawaterk_settings['fawry_title']) && $fawaterk_settings['fawry_title'] !== '' ? $fawaterk_settings['fawry_title'] : false;
+    $mobile_wallet_title = isset($fawaterk_settings['mobile_wallet_title']) && $fawaterk_settings['mobile_wallet_title'] !== '' ? $fawaterk_settings['mobile_wallet_title'] : false;
 
+    $response = wp_remote_get(' https://app.fawaterk.com/api/v2/getPaymentmethods', array('headers' => array('Authorization' => 'Bearer ' . $fawaterk_api_key, 'content-type' => 'application/json')));
 
     if (!is_wp_error($response)) {
 
@@ -116,14 +121,22 @@ function custom_available_payment_gateways($available_gateways)
         unset($available_gateways['fawaterak']);
         if (isset($raw_response['data']) && !is_null($raw_response['data'])) {
             foreach ($raw_response['data'] as $payment_option) {
+
+                $get_payment_title = $payment_option['name_en'];
+                if ($payment_option['name_en'] == 'fawry' && $fawry_title) {
+                    $get_payment_title = $fawry_title;
+                } elseif ($payment_option['name_en'] == 'mobile wallet' && $mobile_wallet_title) {
+                    $get_payment_title = $mobile_wallet_title;
+                }
+
                 if ($payment_option['redirect'] === 'true') {
-
-                    $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $payment_option['name_en']);
-                    $available_gateways[$gateWay->id] = $gateWay;
+                    $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
+                    // $available_gateways[$gateWay->id] = $gateWay;
+                    $available_gateways = [$gateWay->id => $gateWay] + $available_gateways;
                 } else {
-
-                    $gateWay = new WC_Gateway_Fawaterk_NO_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $payment_option['name_en']);
-                    $available_gateways[$gateWay->id] = $gateWay;
+                    $gateWay = new WC_Gateway_Fawaterk_NO_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
+                    // $available_gateways[$gateWay->id] = $gateWay;
+                    $available_gateways = [$gateWay->id => $gateWay] + $available_gateways;
                 }
             }
         }
@@ -131,3 +144,48 @@ function custom_available_payment_gateways($available_gateways)
 
     return $available_gateways;
 }
+
+
+
+/**
+ * Add custom field for mobile payment after custom information section
+ */
+// Add field to the checkout form
+add_filter('woocommerce_checkout_fields', function ($fields) {
+
+    $labels = [
+        'title' => get_locale() === 'ar' ?  __('الرجاء إدخال رقم محفظتك', 'fawaterk') : __('Please enter your wallet phone number', 'fawaterk')
+    ];
+    $fields['billing']['fawaterk_wallet_number'] = array(
+        'type' => 'text',
+        'required'      => true,
+        'label' => $labels['title']
+    );
+    return $fields;
+});
+
+// Save the field when the checkout is processed
+add_action('woocommerce_checkout_update_order_meta', function ($order_id, $posted) {
+    if (isset($posted['fawaterk_wallet_number'])) {
+        update_post_meta($order_id, '_fawaterk_wallet_number', sanitize_text_field($posted['fawaterk_wallet_number']));
+    }
+}, 10, 2);
+
+// Display the field in order details page
+add_action('woocommerce_admin_order_data_after_order_details', function ($order) {
+    $labels = [
+        'title' => get_locale() === 'ar' ?  __('رقم المحفظة', 'fawaterk') : __('Wallet Number', 'fawaterk')
+    ];
+?>
+    <div class="order_data_column">
+        <h4><?php _e('Extra Details', 'woocommerce'); ?></h4>
+        <?php
+        echo '<p><strong>' . $labels['title'] . ':</strong>' . get_post_meta($order->id, '_fawaterk_wallet_number', true) . '</p>'; ?>
+    </div>
+<?php
+});
+add_action('woocommerce_checkout_create_order', function ($order, $data) {
+    if (isset($_POST['fawaterk_wallet_number'])) {
+        $order->update_meta_data('fawaterk_wallet_number', sanitize_text_field($_POST['fawaterk_wallet_number']));
+    }
+}, 10, 2);

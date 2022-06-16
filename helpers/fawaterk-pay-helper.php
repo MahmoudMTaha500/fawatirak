@@ -2,8 +2,8 @@
 class FawaterkPayHelper
 {
     const HOST = "https://app.fawaterk.com/api/v2/invoiceInitPay";
-    
-    public function __construct(WC_Order $order, array $config, $return_url)
+
+    public function __construct(WC_Order $order, array $config, $return_url, $get_order = false)
     {
         $this->order                = $order;
         $this->api_key              = $config['api_key'];
@@ -16,7 +16,7 @@ class FawaterkPayHelper
     public function isValid()
     {
         return $this->is_valid;
-    } 
+    }
 
     public function processOrderData()
     {
@@ -35,14 +35,31 @@ class FawaterkPayHelper
                 "price" => $this->cartTotal,
                 "quantity" => 1
             ];
-    		
+
+
+            // Get mobile wallet number field
+            $mobile_wallet_number = false;
+            try {
+                $json = json_decode($order);
+                if (property_exists($json, 'meta_data')) {
+                    foreach ($json->meta_data as $key => $value) {
+                        if (property_exists($value, 'key') && $value->key == 'fawaterk_wallet_number') {
+                            $mobile_wallet_number = $value->value;
+                            $this->fawaterk_wallet_number = $value->value;
+                        }
+                    }
+                }
+            } catch (Exception $error) {
+                // do something
+            }
 
             $this->customer = [
                 "email"           => $order->get_billing_email() ? $order->get_billing_email() : 'none',
                 "first_name"      => $order->get_billing_first_name() ? $order->get_billing_first_name() : 'none',
-                "last_name"       => $order->get_billing_last_name() ? $order->get_billing_last_name(): 'none',
+                "last_name"       => $order->get_billing_last_name() ? $order->get_billing_last_name() : 'none',
                 "address"         => $order->get_billing_address_1() . ' - ' . $order->get_billing_address_2(),
-                "phone"           => $order->get_billing_phone() ? $order->get_billing_phone(): '00000000000'
+                // "phone"           => $order->get_billing_phone() ? $order->get_billing_phone(): '00000000000'
+                "phone" => $mobile_wallet_number ? $mobile_wallet_number : '00000000001'
             ];
 
             $this->redirectionUrls = [
@@ -106,7 +123,7 @@ class FawaterkPayHelper
                     $hints  = "";
                     $field = "$key: ";
                     foreach ($data as $text) {
-                        $hints .= " $text ";
+                        $hints .= " $text " . $this->fawaterk_wallet_number;
                     }
                 } else {
                     $field = "";
@@ -130,7 +147,7 @@ class FawaterkPayHelper
             "customer"          => $this->customer,
             "redirectionUrls"   => $this->redirectionUrls
         ];
-        // Chage $order to Response 
+        // Chage $order to Response
         $this->response = $this->HttpPost($data);
 
 
