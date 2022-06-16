@@ -53,13 +53,18 @@ class FawaterkPayHelper
                 // do something
             }
 
+            // Use the phone number if there's no wallet number provided
+            if (!$mobile_wallet_number) {
+                $mobile_waller_number = $order->get_billing_phone() ? $order->get_billing_phone() : false;
+            }
+
             $this->customer = [
                 "email"           => $order->get_billing_email() ? $order->get_billing_email() : 'none',
                 "first_name"      => $order->get_billing_first_name() ? $order->get_billing_first_name() : 'none',
                 "last_name"       => $order->get_billing_last_name() ? $order->get_billing_last_name() : 'none',
                 "address"         => $order->get_billing_address_1() . ' - ' . $order->get_billing_address_2(),
                 // "phone"           => $order->get_billing_phone() ? $order->get_billing_phone(): '00000000000'
-                "phone" => $mobile_wallet_number ? $mobile_wallet_number : '00000000001'
+                "phone" => $mobile_wallet_number ? $mobile_wallet_number : '00000000000'
             ];
 
             $this->redirectionUrls = [
