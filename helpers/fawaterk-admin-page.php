@@ -64,6 +64,7 @@ function fawaterk_plugin_options_page()
 		'webhook_url'           => array(
 			'title'       => __('WebHook Url', 'fawaterk'),
 			'type'        => 'text',
+			'disabled' => true,
 			'description' =>  __('Copy This to the redirect url field at Fawaterak Website'),
 			'default' => get_site_url() . '/wc-api/fawaterak_webhook',
 			'custom_attributes' => array('readonly' => 'readonly'),
@@ -114,7 +115,7 @@ function fawaterk_plugin_options_page()
 								<label class="description" for="<?php echo $field_id; ?>"><?php echo $field['title']; ?></label>
 							</th>
 							<td>
-								<input id="<?php echo $field_id; ?>" class="regular-text" type="text" name="<?php echo $field_id; ?>" value="<?php esc_attr_e($options[$id]); ?>" />
+								<input <?php if (isset($field['disabled'])) echo 'disabled'; ?> id="<?php echo $field_id; ?>" class="regular-text" type="text" name="<?php echo $field_id; ?>" value="<?php esc_attr_e($options[$id]); ?>" />
 								<p class="description">
 									<?php echo $field['description']; ?>
 								</p>

@@ -189,3 +189,11 @@ add_action('woocommerce_checkout_create_order', function ($order, $data) {
         $order->update_meta_data('fawaterk_wallet_number', sanitize_text_field($_POST['fawaterk_wallet_number']));
     }
 }, 10, 2);
+
+
+/**
+* add custom css
+*/
+add_action('wp_enqueue_styles' , function() {
+    wp_enqueue_style('fawaterk-frontend' , untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
+});
