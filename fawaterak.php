@@ -5,7 +5,7 @@
  * Description: Fawaterak payment gateway.
  * Author: Fawaterak
  * Author URI: https://www.fawaterk.com/
- * Version: 1.2.1
+ * Version: 1.2.2
  *
 */
 
