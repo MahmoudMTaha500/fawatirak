@@ -55,7 +55,7 @@ class FawaterkPayHelper
 
             // Use the phone number if there's no wallet number provided
             if (!$mobile_wallet_number) {
-                $mobile_waller_number = $order->get_billing_phone() ? $order->get_billing_phone() : false;
+                $mobile_wallet_number = $order->get_billing_phone() ? $order->get_billing_phone() : false;
             }
 
             $this->customer = [

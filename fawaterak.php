@@ -158,7 +158,7 @@ add_filter('woocommerce_checkout_fields', function ($fields) {
     ];
     $fields['billing']['fawaterk_wallet_number'] = array(
         'type' => 'text',
-        'required'      => true,
+        'required'      => false,
         'label' => $labels['title']
     );
     return $fields;
@@ -194,6 +194,8 @@ add_action('woocommerce_checkout_create_order', function ($order, $data) {
 /**
 * add custom css
 */
-add_action('wp_enqueue_styles' , function() {
+add_action('wp_enqueue_scripts' , function() {
     wp_enqueue_style('fawaterk-frontend' , untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
+    wp_enqueue_script('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.js');
+
 });
