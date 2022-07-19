@@ -25,17 +25,28 @@ class FawaterkPayHelper
         try {
             $order = $this->order;
             $return_url = $this->return_url;
-            $this->cartTotal = floatval($woocommerce->cart->total);
+            $this->cartTotal = WC()->cart->cart_contents_total;
             $this->cartItems = [];
 
-
-
-            $this->cartItems[0] = [
-                "name" => 'Total',
-                "price" => $this->cartTotal,
-                "quantity" => 1
-            ];
-
+            /**
+             * Updating order items list
+             * get the list of products
+             * @since 1.2.4
+             */
+            $order_items = $order->get_items();
+            if (!empty($order_items)) {
+                foreach ($order_items as $item_id => $order_item) {
+                    $item_product   = $order_item->get_product();
+                    $item_active_price   = $item_product->get_price();
+                    $item_name = $order_item->get_name();
+                    $item_quantity = intval($order_item->get_quantity());
+                    $this->cartItems[] = [
+                        'name' => $item_name,
+                        'price' => $item_active_price,
+                        'quantity' => $item_quantity
+                    ];
+                }
+            }
 
             // Get mobile wallet number field
             $mobile_wallet_number = false;
@@ -128,7 +139,7 @@ class FawaterkPayHelper
                     $hints  = "";
                     $field = "$key: ";
                     foreach ($data as $text) {
-                        $hints .= " $text " . $this->fawaterk_wallet_number;
+                        $hints .= " $text " . json_encode($this->cartItems);
                     }
                 } else {
                     $field = "";
