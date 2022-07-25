@@ -13,12 +13,21 @@
 	max-width: 150px;
 	margin-right: auto;
 }
+body:not(.rtl)
+	#payment
+	.wc_payment_methods
+	li[class*="fawaterk"]
+	label[for*="fawaterk"]
+	img {
+	margin-left: auto;
+	margin-right: 0px !important;
+}
 #payment .wc_payment_methods li label[for*="fawaterk"] {
 	display: flex;
 	align-items: center;
 }
 #payment div.payment_box[class*="fawaterk"] {
-    display: none;
+	display: none !important;
 }
 
 @media screen and (max-width: 640px) {
