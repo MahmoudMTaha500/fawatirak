@@ -4,3 +4,27 @@
 #fawaterk_waller_number_field.visible {
 	display: block !important;
 } */
+
+/* Update for payment gateways style */
+/*
+	@since 1.2.5
+*/
+#payment .wc_payment_methods li[class*="fawaterk"] label[for*="fawaterk"] img {
+	max-width: 150px;
+	margin-right: auto;
+}
+#payment .wc_payment_methods li label[for*="fawaterk"] {
+	display: flex;
+	align-items: center;
+}
+
+@media screen and (max-width: 640px) {
+	.woocommerce-checkout #payment div.payment_box {
+		display: none;
+	}
+	#payment .wc_payment_methods li[class*="fawaterk"] {
+	}
+	#payment .wc_payment_methods li label[for*="fawaterk"] img {
+		max-width: 150px;
+	}
+}
