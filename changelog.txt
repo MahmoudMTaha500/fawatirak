@@ -1,0 +1,4 @@
+- 1.2.4
+	- Fixed a bug in product information sent to the api, product information did not contain product names
+- 1.2.5
+	- Updated main.css, fixed gateways styles
