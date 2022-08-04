@@ -30,7 +30,45 @@ body:not(.rtl)
 	display: none !important;
 }
 
+/* Update custom field css */
+.mobile-wallet-container {
+	position: fixed;
+	z-index: 99999;
+	bottom: 0;
+	top: 0;
+	border-radius: 4px;
+	background: #fff;
+	padding: 1em 2em;
+	width: 30vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+	right: 0;
+	left: 0;
+	margin: auto;
+	height: 150px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+	flex-direction: column;
+}
+.mobile-wallet-container.hidden {
+	display: none;
+}
+
+.mobile-wallet-container .close-field {
+	position: absolute;
+	top: 1em;
+	right: 1em;
+	display: block;
+	cursor: pointer;
+}
+.mobile-wallet-container .submit-field {
+}
+
 @media screen and (max-width: 640px) {
+	.mobile-wallet-container {
+		width: 60vw;
+	}
 	.woocommerce-checkout #payment div.payment_box {
 		display: none;
 	}

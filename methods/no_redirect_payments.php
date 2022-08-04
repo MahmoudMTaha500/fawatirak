@@ -12,7 +12,7 @@ class WC_Gateway_Fawaterk_NO_Redirect_Payments extends WC_Payment_Gateway
         $this->method_public_description = __('Pay with ' . $title);
         $this->supports           = ['products'];
         $this->payment_method_id   = $id;
-        $this->fawaterk_wallet_number = '01118389502';
+        $this->fawaterk_wallet_number = '000000000000';
 
 
         $this->init_form_fields();

@@ -5,7 +5,7 @@
  * Description: Fawaterak payment gateway.
  * Author: Fawaterak
  * Author URI: https://www.fawaterk.com/
- * Version: 1.2.5
+ * Version: 1.2.6
  *
 */
 
@@ -121,7 +121,6 @@ function custom_available_payment_gateways($available_gateways)
         unset($available_gateways['fawaterak']);
         if (isset($raw_response['data']) && !is_null($raw_response['data'])) {
             foreach ($raw_response['data'] as $payment_option) {
-
                 $get_payment_title = $payment_option['name_en'];
                 if ($payment_option['name_en'] == 'fawry' && $fawry_title) {
                     $get_payment_title = $fawry_title;
@@ -132,10 +131,20 @@ function custom_available_payment_gateways($available_gateways)
                 if ($payment_option['redirect'] === 'true') {
                     $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
                     // $available_gateways[$gateWay->id] = $gateWay;
+
+                    // Change gateway HTML id
+                    if ($payment_option['name_en'] == 'mobile wallet') {
+                        $gateWay->id = $gateWay->id . '_mobile_wallet';
+                    }
                     $available_gateways = [$gateWay->id => $gateWay] + $available_gateways;
                 } else {
                     $gateWay = new WC_Gateway_Fawaterk_NO_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
                     // $available_gateways[$gateWay->id] = $gateWay;
+
+                    // Change gateway HTML id
+                    if ($payment_option['name_en'] == 'mobile wallet') {
+                        $gateWay->id = $gateWay->id . '_mobile_wallet';
+                    }
                     $available_gateways = [$gateWay->id => $gateWay] + $available_gateways;
                 }
             }
@@ -159,7 +168,7 @@ add_filter('woocommerce_checkout_fields', function ($fields) {
     $fields['billing']['fawaterk_wallet_number'] = array(
         'type' => 'text',
         'required'      => false,
-        'label' => $labels['title']
+        'label' => false
     );
     return $fields;
 });
@@ -170,6 +179,90 @@ add_action('woocommerce_checkout_update_order_meta', function ($order_id, $poste
         update_post_meta($order_id, '_fawaterk_wallet_number', sanitize_text_field($posted['fawaterk_wallet_number']));
     }
 }, 10, 2);
+
+// Change custom wallet field HTML output
+add_filter('woocommerce_form_field_text', function ($field, $key, $args, $value) {
+    if (!empty($field) && $key === 'fawaterk_wallet_number') {
+
+        $labels = [
+            'title' => get_locale() === 'ar' ?  __('الرجاء إدخال رقم محفظتك', 'fawaterk') : __('Please enter your wallet phone number', 'fawaterk')
+        ];
+        $submit_label = get_locale() === 'ar' ? esc_html__('ادخال', 'fawaterk') : esc_html__('Submit', 'fawaterk');
+        $close_button = '<span class="close-field"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+width="30" height="30"
+viewBox="0 0 30 30"
+style=" fill:#000000;">    <path d="M 7 4 C 6.744125 4 6.4879687 4.0974687 6.2929688 4.2929688 L 4.2929688 6.2929688 C 3.9019687 6.6839688 3.9019687 7.3170313 4.2929688 7.7070312 L 11.585938 15 L 4.2929688 22.292969 C 3.9019687 22.683969 3.9019687 23.317031 4.2929688 23.707031 L 6.2929688 25.707031 C 6.6839688 26.098031 7.3170313 26.098031 7.7070312 25.707031 L 15 18.414062 L 22.292969 25.707031 C 22.682969 26.098031 23.317031 26.098031 23.707031 25.707031 L 25.707031 23.707031 C 26.098031 23.316031 26.098031 22.682969 25.707031 22.292969 L 18.414062 15 L 25.707031 7.7070312 C 26.098031 7.3170312 26.098031 6.6829688 25.707031 6.2929688 L 23.707031 4.2929688 C 23.316031 3.9019687 22.682969 3.9019687 22.292969 4.2929688 L 15 11.585938 L 7.7070312 4.2929688 C 7.5115312 4.0974687 7.255875 4 7 4 z"></path></svg></span>';
+        $submit_button = '<a href="#" class="submit-field">' . $submit_label . '</a>';
+
+
+        if ($args['required']) {
+            $args['class'][] = 'validate-required';
+            $required = ' <abbr class="required" title="' . esc_attr__('required', 'woocommerce') . '">*</abbr>';
+        } else {
+            $required = '';
+        }
+
+        $args['maxlength'] = ($args['maxlength']) ? 'maxlength="' . absint($args['maxlength']) . '"' : '';
+
+        $args['autocomplete'] = ($args['autocomplete']) ? 'autocomplete="' . esc_attr($args['autocomplete']) . '"' : '';
+
+        if (
+            is_string($args['label_class'])
+        ) {
+            $args['label_class'] = array($args['label_class']);
+        }
+
+        if (
+            is_null($value)
+        ) {
+            $value = $args['default'];
+        }
+
+        // Custom attribute handling
+        $custom_attributes = array();
+
+        // Custom attribute handling
+        $custom_attributes = array();
+
+        if (
+            !empty($args['custom_attributes']) && is_array($args['custom_attributes'])
+        ) {
+            foreach ($args['custom_attributes'] as $attribute => $attribute_value) {
+                $custom_attributes[] = esc_attr($attribute) . '="' . esc_attr($attribute_value) . '"';
+            }
+        }
+
+        $field = '';
+        $label_id = $args['id'];
+        $field_container = '<p class="form-row %1$s" id="%2$s">%3$s</p>';
+
+        $field .= '<div class="mobile-wallet-container hidden fawaterk-mobile-waller-container"><div class="mobile-wallet-field-container"><h3>' . $labels['title'] . '</h3><input type="' . esc_attr($args['type']) . '" class="input-text ' . esc_attr(implode(' ', $args['input_class'])) . '" name="' . esc_attr($key) . '" id="' . esc_attr($args['id']) . '" placeholder="' . esc_attr($args['placeholder']) . '" ' . $args['maxlength'] . ' ' . $args['autocomplete'] . ' value="' . esc_attr($value) . '" ' . implode(' ', $custom_attributes) . ' /></div> ' . $close_button . $submit_button  . ' </div>';
+
+        if (
+            !empty($field)
+        ) {
+            $field_html = '';
+
+            $field_html .= $field;
+
+            if ($args['description']) {
+                $field_html .= '<span class="description">' . esc_html($args['description']) . '</span>';
+            }
+
+            if ($args['label'] && 'checkbox' != $args['type']) {
+                $field_html .= '<label for="' . esc_attr($label_id) . '" class="' . esc_attr(implode(' ', $args['label_class'])) . '">' . $args['label'] . $required . '</label>';
+            }
+
+            $container_class = 'form-row ' . esc_attr(implode(' ', $args['class']));
+            $container_id = esc_attr($args['id']) . '_field';
+
+            $after = !empty($args['clear']) ? '<div class="clear"></div>' : '';
+
+            $field = sprintf($field_container, $container_class, $container_id, $field_html) . $after;
+        }
+    }
+    return $field;
+}, 10, 4);
 
 // Display the field in order details page
 add_action('woocommerce_admin_order_data_after_order_details', function ($order) {
@@ -192,10 +285,9 @@ add_action('woocommerce_checkout_create_order', function ($order, $data) {
 
 
 /**
-* add custom css
-*/
-add_action('wp_enqueue_scripts' , function() {
-    wp_enqueue_style('fawaterk-frontend' , untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
+ * add custom css
+ */
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_style('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
     wp_enqueue_script('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.js');
-
 });

@@ -139,7 +139,7 @@ class FawaterkPayHelper
                     $hints  = "";
                     $field = "$key: ";
                     foreach ($data as $text) {
-                        $hints .= " $text " . json_encode($this->cartItems);
+                        $hints .= " $text ";
                     }
                 } else {
                     $field = "";
