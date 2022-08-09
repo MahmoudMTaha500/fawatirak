@@ -56,6 +56,12 @@ function fawaterk_plugin_options_page()
 			'default'     => __('Fawry', 'fawaterk'),
 			'desc_tip'    => true,
 		),
+		'payment_pending_page'                 => array(
+			'title'       => __('Payment Pending Page', 'fawaterk'),
+			'type'        => 'text',
+			'description' => __('Add a url to redirect the customer to if the payment still pending.', 'fawaterk'),
+			'desc_tip'    => true,
+		),
 		'private_key'           => array(
 			'title'       => __('API credentials', 'fawaterk'),
 			'type'        => 'text',

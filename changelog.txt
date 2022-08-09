@@ -7,3 +7,5 @@
 	- Updated mobile wallet field HTML filter
 - 1.2.7
 	- Updated Fawry Payment message
+- 1.2.8
+	- Added custom option to redirect users if the order is pending or failed

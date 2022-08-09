@@ -5,7 +5,7 @@
  * Description: Fawaterak payment gateway.
  * Author: Fawaterak
  * Author URI: https://www.fawaterk.com/
- * Version: 1.2.7
+ * Version: 1.2.8
  *
 */
 
@@ -290,4 +290,18 @@ add_action('woocommerce_checkout_create_order', function ($order, $data) {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
     wp_enqueue_script('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.js');
+});
+
+
+/**
+ * Custom thank you redirect
+ */
+add_action('woocommerce_thankyou', function ($order_id) {
+    $fawaterk_settings = get_option('fawaterk_plugin_options');
+    $payment_pending_page = $fawaterk_settings['payment_pending_page'];
+    $order = wc_get_order($order_id);
+    if ($order->has_status('failed') || $order->has_status('pending')) {
+        wp_safe_redirect($payment_pending_page);
+        exit;
+    }
 });
