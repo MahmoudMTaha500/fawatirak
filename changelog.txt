@@ -5,3 +5,5 @@
 - 1.2.6
 	- Updated mobile wallet field in checkout page, the field is not a popup
 	- Updated mobile wallet field HTML filter
+- 1.2.7
+	- Updated Fawry Payment message
