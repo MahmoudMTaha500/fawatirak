@@ -1,7 +1,7 @@
 <?php
 class FawaterkPayHelper
 {
-    const HOST = "https://app.fawaterk.com/api/v2/invoiceInitPay";
+    const HOST = FAWATERK_ENABLE_STAGING ? 'https://fawaterkstage.com/api/v2/invoiceInitPay' : "https://app.fawaterk.com/api/v2/invoiceInitPay";
 
     public function __construct(WC_Order $order, array $config, $return_url, $get_order = false)
     {

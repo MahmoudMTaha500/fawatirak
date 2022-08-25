@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+define('FAWATERK_ENABLE_STAGING', false);
 define('WOOCOMMERCE_GATEWAY_FAWATERAK_VERSION', '1.0.6'); // WRCS: DEFINED_VERSION.
 define('WOOCOMMERCE_GATEWAY_FAWATERAK_URL', untrailingslashit(plugins_url(basename(plugin_dir_path(__FILE__)), basename(__FILE__))));
 define('WOOCOMMERCE_GATEWAY_FAWATERAK_PATH', untrailingslashit(plugin_dir_path(__FILE__)));
@@ -110,7 +111,8 @@ function custom_available_payment_gateways($available_gateways)
     $fawry_title = isset($fawaterk_settings['fawry_title']) && $fawaterk_settings['fawry_title'] !== '' ? $fawaterk_settings['fawry_title'] : false;
     $mobile_wallet_title = isset($fawaterk_settings['mobile_wallet_title']) && $fawaterk_settings['mobile_wallet_title'] !== '' ? $fawaterk_settings['mobile_wallet_title'] : false;
 
-    $response = wp_remote_get(' https://app.fawaterk.com/api/v2/getPaymentmethods', array('headers' => array('Authorization' => 'Bearer ' . $fawaterk_api_key, 'content-type' => 'application/json')));
+    $payments_gateway_url = FAWATERK_ENABLE_STAGING ? 'https://fawaterkstage.com/api/v2/getPaymentmethods' : 'https://app.fawaterk.com/api/v2/getPaymentmethods';
+    $response = wp_remote_get($payments_gateway_url, array('headers' => array('Authorization' => 'Bearer ' . $fawaterk_api_key, 'content-type' => 'application/json')));
 
     if (!is_wp_error($response)) {
 
@@ -296,12 +298,12 @@ add_action('wp_enqueue_scripts', function () {
 /**
  * Custom thank you redirect
  */
-add_action('woocommerce_thankyou', function ($order_id) {
-    $fawaterk_settings = get_option('fawaterk_plugin_options');
-    $payment_pending_page = $fawaterk_settings['payment_pending_page'];
-    $order = wc_get_order($order_id);
-    if ($order->has_status('failed') || $order->has_status('pending')) {
-        wp_safe_redirect($payment_pending_page);
-        exit;
-    }
-});
+// add_action('woocommerce_thankyou', function ($order_id) {
+    // $fawaterk_settings = get_option('fawaterk_plugin_options');
+    // $payment_pending_page = $fawaterk_settings['payment_pending_page'];
+    // $order = wc_get_order($order_id);
+    // if ($order->has_status('failed') || $order->has_status('pending')) {
+    //     wp_safe_redirect($payment_pending_page);
+    //     exit;
+    // }
+// });
