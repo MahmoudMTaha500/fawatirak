@@ -9,3 +9,5 @@
 	- Updated Fawry Payment message
 - 1.2.8
 	- Added custom option to redirect users if the order is pending or failed
+- 1.2.9
+	- Fixed missing aman ref number in order page.
