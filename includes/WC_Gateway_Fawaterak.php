@@ -245,6 +245,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
 
 
+
         if (!is_wp_error($response)) {
 
             $body = json_decode($response['body'], true);

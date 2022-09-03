@@ -89,6 +89,10 @@ function woocommerce_fawaterk_modify_thank_you_text($str, $order)
     } elseif ($payment_method_id === 'fawaterk_4') {
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, You will receive a message on the wallet number with how to complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong>ستصلك رسالة على رقم المحفظة بكيفية إتمام عملية الدفع</strong>';
+    } elseif ($payment_method_id === 'fawaterk_12') {
+        $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Aman machine and complete the payment process.</Strong>' . '<br><br>';
+        $new_str .= '<br>' . '<Strong style="font-size:20px;">Aman Refrence Number: </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['amanCode'] . '</span>';
+        $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة امان وإتمام عملية الدفع</strong>';
     } else {
         return $str;
     }

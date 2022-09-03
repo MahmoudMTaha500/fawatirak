@@ -166,7 +166,6 @@ class FawaterkPayHelper
         // Chage $order to Response
         $this->response = $this->HttpPost($data);
 
-
         if ($this->response) {
             if (isset($this->response['invoice_key'])) {
                 // Return the invoice Key
