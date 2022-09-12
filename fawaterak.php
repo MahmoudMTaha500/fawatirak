@@ -5,7 +5,7 @@
  * Description: Fawaterak payment gateway.
  * Author: Fawaterak
  * Author URI: https://www.fawaterk.com/
- * Version: 1.2.9
+ * Version: 1.2.10
  *
 */
 
@@ -81,15 +81,16 @@ function woocommerce_fawaterk_modify_thank_you_text($str, $order)
 
     $new_str = '';
     if ($payment_method_id === 'fawaterk_3') {
-
+        // Fawry payment message
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Fawry machine and complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong style="font-size:20px;">Fawry Refrence Number: </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['fawryCode'] . '</span>';
         $new_str .= '<br>' . '<Strong style="font-size:20px;">Fawry Expiration Date: </Strong> <span style="font-size: 20px;background: red;padding: 0 5px;font-weight: bold;color: aliceblue;"> ' . $payment_data['expireDate'] . '</span>';
-        $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع</strong>';
+        $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع  من خلال رقم الخدمه 788</strong>';
     } elseif ($payment_method_id === 'fawaterk_4') {
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, You will receive a message on the wallet number with how to complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong>ستصلك رسالة على رقم المحفظة بكيفية إتمام عملية الدفع</strong>';
     } elseif ($payment_method_id === 'fawaterk_12') {
+        // Aman payment message
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Aman machine and complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong style="font-size:20px;">Aman Refrence Number: </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['amanCode'] . '</span>';
         $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة امان وإتمام عملية الدفع</strong>';
