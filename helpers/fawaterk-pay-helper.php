@@ -46,6 +46,17 @@ class FawaterkPayHelper
                         'quantity' => $item_quantity
                     ];
                 }
+
+                // Add discount
+                $discount_coupons = $woocommerce->cart->get_applied_coupons();
+                if (!empty($discount_coupons)) {
+                    $discount_value = WC()->cart->get_subtotal() - WC()->cart->cart_contents_total;
+                    $this->cartItems[] = [
+                        'name' => 'discount',
+                        'price' => -intval($discount_value),
+                        'quantity' => 1
+                    ];
+                }
             }
 
             // Get mobile wallet number field
@@ -130,7 +141,6 @@ class FawaterkPayHelper
     public function getError()
     {
         $error = "";
-
         if (is_string($this->error) && $this->error != '') {
             $error .= "<li>$this->error</li>";
         } else if (is_array($this->error) && !empty($this->error)) {
@@ -163,6 +173,7 @@ class FawaterkPayHelper
             "customer"          => $this->customer,
             "redirectionUrls"   => $this->redirectionUrls
         ];
+
         // Chage $order to Response
         $this->response = $this->HttpPost($data);
 

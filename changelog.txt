@@ -13,3 +13,5 @@
 	- Fixed missing aman ref number in order page.
 - 1.2.10
 	- Updated payment message for Fawry
+- 1.2.11
+	- Fixed a bug when user apply discount coupon

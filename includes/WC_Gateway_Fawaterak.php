@@ -236,6 +236,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
         }
         $payload['cartItems'] = $cartItems;
 
+
         $args['body'] = json_encode($payload);
 
         /*
