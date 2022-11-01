@@ -18,7 +18,9 @@ final class WC_Gateway_FAWATERAK_Blocks_Support extends AbstractPaymentMethodTyp
 	 */
 	public function initialize() {
 		$this->settings = get_option('fawaterk_plugin_options', [] );
+
 	}
+
 
 	/**
 	 * Returns if this payment method should be active. If false, the scripts will not be enqueued.
@@ -70,6 +72,7 @@ final class WC_Gateway_FAWATERAK_Blocks_Support extends AbstractPaymentMethodTyp
 			'description' => $this->get_setting( 'description' ),
 			'supports'    => $this->get_supported_features(),
 		];
+		
 	}
 
 	/**
@@ -79,5 +82,7 @@ final class WC_Gateway_FAWATERAK_Blocks_Support extends AbstractPaymentMethodTyp
 	 */
 	public function get_supported_features() {
 		$payment_gateways = WC()->payment_gateways->payment_gateways();
-		return $payment_gateways['fawaterak']->supports;	}
+		return $payment_gateways['fawaterak']->supports;
+	
+	}
 }

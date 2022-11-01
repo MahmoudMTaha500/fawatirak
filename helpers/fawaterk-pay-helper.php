@@ -11,6 +11,8 @@ class FawaterkPayHelper
         $this->return_url           = $return_url;
         $this->processOrderData();
         $this->order_currency  = $order->get_currency();
+
+
     }
 
     public function isValid()
@@ -27,6 +29,7 @@ class FawaterkPayHelper
             $return_url = $this->return_url;
             $this->cartTotal = WC()->cart->cart_contents_total;
             $this->cartItems = [];
+            // echo "<pre>";        print_r($this); echo "</pre>";  die;
 
             /**
              * Updating order items list
@@ -91,7 +94,7 @@ class FawaterkPayHelper
 
             $this->redirectionUrls = [
                 "successUrl"          => $return_url,
-                "failUrl"             => $return_url,
+                "failUrl"             => "https://www.google.com/",
                 "pendingUrl"          => $return_url
             ];
 
@@ -171,11 +174,17 @@ class FawaterkPayHelper
             "cartItems"         => $this->cartItems,
             "currency"          => $this->order_currency,
             "customer"          => $this->customer,
-            "redirectionUrls"   => $this->redirectionUrls
+            "redirectionUrls"   => $this->redirectionUrls,
+            "Total"         => $this->order->data['total'],
         ];
+        // echo "<pre> xxxxxx";        print_r(); echo "</pre>"; 
+        // "Total"         => $this->order->data['total'],
+// 
 
         // Chage $order to Response
         $this->response = $this->HttpPost($data);
+
+        echo "<pre> xxxxxx";        print_r( $this->response); echo "</pre>"; 
 
         if ($this->response) {
             if (isset($this->response['invoice_key'])) {

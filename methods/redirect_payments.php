@@ -29,10 +29,12 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
 
     public function init_form_fields()
     {
+
         $this->form_fields = FawaterkAdminHelper::return_admin_options(
             $this->method_title,
             $this->method_public_description,
         );
+
     }
 
     public function process_payment($order_id)
@@ -45,6 +47,9 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             "payment_method_id" => $this->payment_method_id,
         ];
         $return_url = WC_Payment_Gateway::get_return_url( $order );
+        // echo "<pre>ءءء";        print_r($return_url); echo "</pre>";  
+
+
         $process = new FawaterkPayHelper($order, $config, $return_url , $order);
 
         if (!$process->isValid()) {
@@ -57,12 +62,17 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             throw new Exception("Failed to register order.");
         }
         $payment_data = $process->getPaymentData();
+        echo "<pre>";        print_r($payment_data); echo "</pre>";  die;
 
         if (!$payment_data) {
             throw new Exception("Failed to Get Payment Data.");
         }
+    //   die;
+    // echo "<pre> order arrrrrrrrrrrrrrrryyyyyyyyy";        print_r($order); echo "</pre>";  die;
 
         $process->processOrder();
+            
+        
         return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
     }
 
@@ -73,6 +83,7 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
 
     public function webhook_callback()
     {
+
         FawaterkAdminHelper::webhook_callback($this->api_key);
     }
 }

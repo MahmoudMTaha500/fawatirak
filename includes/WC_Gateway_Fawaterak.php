@@ -62,6 +62,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
         }
 
         // You can also register a webhook here
+
         add_action('woocommerce_api_fawaterak_webhook', array($this, 'webhook'));
     }
 
@@ -179,6 +180,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
                 ];
                 $i++;
             }
+
         }
 
 
@@ -238,6 +240,8 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
 
         $args['body'] = json_encode($payload);
+        echo "<pre> xxxxxx";        print_r($args); echo "</pre>"; 
+        
 
         /*
         * Your API interaction could be built with wp_remote_post()
@@ -275,6 +279,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
             wc_add_notice('Connection error.', 'error');
             return;
         }
+
     }
 
     // Check if we are forcing SSL on checkout pages
@@ -293,6 +298,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
     */
     public function webhook()
     {
+
         global $wpdb, $woocommerce;
 
         try {

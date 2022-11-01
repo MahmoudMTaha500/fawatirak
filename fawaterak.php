@@ -65,20 +65,24 @@ function woocommerce_fawaterak_woocommerce_blocks_support()
             'woocommerce_blocks_payment_method_type_registration',
             function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
                 $payment_method_registry->register(new WC_Gateway_FAWATERAK_Blocks_Support);
+
             }
         );
     }
+
 }
 
 
 add_filter('woocommerce_thankyou_order_received_text', 'woocommerce_fawaterk_modify_thank_you_text', 99999999, 2);
 
 function woocommerce_fawaterk_modify_thank_you_text($str, $order)
+
 {
     $payment_data =  get_post_meta($order->get_id(), 'payment_data', true);
     // This will give us the payment method id
     $payment_method_id =  $order->get_payment_method();
-
+            // print_r($payment_data);
+            // print_r($payment_method_id);die;
     $new_str = '';
     if ($payment_method_id === 'fawaterk_3') {
         // Fawry payment message
@@ -94,6 +98,29 @@ function woocommerce_fawaterk_modify_thank_you_text($str, $order)
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Aman machine and complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong style="font-size:20px;">Aman Refrence Number: </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['amanCode'] . '</span>';
         $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة امان وإتمام عملية الدفع</strong>';
+
+    } elseif ($payment_method_id === 'fawaterk_4_mobile_wallet') {
+        // Aman payment message
+        
+    
+        $new_str .= "<input type='hidden'   id='qrdata' vaule='$payment_data[meezaQrCode]'  ";
+        $new_str .= " <span id='qrcode' > </span>";
+        $new_str .= '<br>' . '<Strong>   ستصلك رساله علي هاتفك بخطوات اتمام عمليه الدفع</strong>';
+        // wp_add_inline_script( 'qrcode-js', " 
+       
+        // <script>
+        // var qr_data = document.getElementById('qrdata');
+        // var qr_code =   new QRCode(document.getElementById('qrcode'));
+        // var data = qr_data.value;
+        // alert(12)
+        // qr_code.makeCode(data);
+        //  </script>
+        // ", 'after' );
+       
+       
+        
+        
+       
     } else {
         return $str;
     }
@@ -134,10 +161,13 @@ function custom_available_payment_gateways($available_gateways)
                 } elseif ($payment_option['name_en'] == 'mobile wallet' && $mobile_wallet_title) {
                     $get_payment_title = $mobile_wallet_title;
                 }
+                // echo "< pre>";        print_r($payment_method_registry); echo "</pre>";  die;
 
                 if ($payment_option['redirect'] === 'true') {
                     $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
-                    // $available_gateways[$gateWay->id] = $gateWay;
+                    $available_gateways[$gateWay->id] = $gateWay;
+                // echo "<pre>";        print_r($gateWay); echo "</pre>";  die;
+
 
                     // Change gateway HTML id
                     if ($payment_option['name_en'] == 'mobile wallet') {
@@ -199,8 +229,9 @@ add_filter('woocommerce_form_field_text', function ($field, $key, $args, $value)
 width="30" height="30"
 viewBox="0 0 30 30"
 style=" fill:#000000;">    <path d="M 7 4 C 6.744125 4 6.4879687 4.0974687 6.2929688 4.2929688 L 4.2929688 6.2929688 C 3.9019687 6.6839688 3.9019687 7.3170313 4.2929688 7.7070312 L 11.585938 15 L 4.2929688 22.292969 C 3.9019687 22.683969 3.9019687 23.317031 4.2929688 23.707031 L 6.2929688 25.707031 C 6.6839688 26.098031 7.3170313 26.098031 7.7070312 25.707031 L 15 18.414062 L 22.292969 25.707031 C 22.682969 26.098031 23.317031 26.098031 23.707031 25.707031 L 25.707031 23.707031 C 26.098031 23.316031 26.098031 22.682969 25.707031 22.292969 L 18.414062 15 L 25.707031 7.7070312 C 26.098031 7.3170312 26.098031 6.6829688 25.707031 6.2929688 L 23.707031 4.2929688 C 23.316031 3.9019687 22.682969 3.9019687 22.292969 4.2929688 L 15 11.585938 L 7.7070312 4.2929688 C 7.5115312 4.0974687 7.255875 4 7 4 z"></path></svg></span>';
-        $submit_button = '<a href="#" class="submit-field">' . $submit_label . '</a>';
-
+        // $submit_button = '<a href="#" class="submit-field">' . $submit_label . '</a>';
+        $submit_button = '<button   type="button"    class=" submit-field btn btn-primary " >' . $submit_label . '</button>';
+ 
 
         if ($args['required']) {
             $args['class'][] = 'validate-required';
@@ -243,7 +274,7 @@ style=" fill:#000000;">    <path d="M 7 4 C 6.744125 4 6.4879687 4.0974687 6.292
         $label_id = $args['id'];
         $field_container = '<p class="form-row %1$s" id="%2$s">%3$s</p>';
 
-        $field .= '<div class="mobile-wallet-container hidden fawaterk-mobile-waller-container"><div class="mobile-wallet-field-container"><h3>' . $labels['title'] . '</h3><input type="' . esc_attr($args['type']) . '" class="input-text ' . esc_attr(implode(' ', $args['input_class'])) . '" name="' . esc_attr($key) . '" id="' . esc_attr($args['id']) . '" placeholder="' . esc_attr($args['placeholder']) . '" ' . $args['maxlength'] . ' ' . $args['autocomplete'] . ' value="' . esc_attr($value) . '" ' . implode(' ', $custom_attributes) . ' /></div> ' . $close_button . $submit_button  . ' </div>';
+        $field .= '<div class="mobile-wallet-container hidden fawaterk-mobile-waller-container"><div class="mobile-wallet-field-container"><h3>' . $labels['title'] . '</h3><input type="' . esc_attr($args['type']) . '" class="input-text ' . esc_attr(implode(' ', $args['input_class'])) . '" name="' . esc_attr($key) . '" id="' . esc_attr($args['id']) . '" placeholder="' . esc_attr($args['placeholder']) . '" ' . $args['maxlength'] . ' ' . $args['autocomplete'] . ' value="' . esc_attr($value) . '" ' . implode(' ', $custom_attributes) . ' />  '.  $submit_button  .  ' </div> ' . $close_button . ' </div>';
 
         if (
             !empty($field)
@@ -297,8 +328,11 @@ add_action('woocommerce_checkout_create_order', function ($order, $data) {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.css');
     wp_enqueue_script('fawaterk-frontend', untrailingslashit(plugin_dir_url(__FILE__)) . '/assets/main.js');
+
 });
 
+// wp_register_script( 'qrcode-js', '/assets/qrcode.min.js' , '', '', true );
+// wp_enqueue_script( 'qrcode-js' );
 
 /**
  * Custom thank you redirect
@@ -312,3 +346,7 @@ add_action('wp_enqueue_scripts', function () {
     //     exit;
     // }
 // });
+
+
+
+

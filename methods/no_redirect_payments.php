@@ -64,6 +64,7 @@ class WC_Gateway_Fawaterk_NO_Redirect_Payments extends WC_Payment_Gateway
         }
 
         $process->processOrder();
+
         return ['result' => 'success', 'redirect' => WC_Payment_Gateway::get_return_url($order)];
     }
 
