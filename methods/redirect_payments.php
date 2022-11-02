@@ -62,7 +62,7 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             throw new Exception("Failed to register order.");
         }
         $payment_data = $process->getPaymentData();
-        echo "<pre>";        print_r($payment_data); echo "</pre>";  die;
+        // echo "<pre>";        print_r($payment_data); echo "</pre>";  die;
 
         if (!$payment_data) {
             throw new Exception("Failed to Get Payment Data.");

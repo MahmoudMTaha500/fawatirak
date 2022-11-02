@@ -20,6 +20,7 @@ class FawaterkPayHelper
         return $this->is_valid;
     }
 
+
     public function processOrderData()
     {
         global $woocommerce;
@@ -37,19 +38,32 @@ class FawaterkPayHelper
              * @since 1.2.4
              */
             $order_items = $order->get_items();
-            if (!empty($order_items)) {
-                foreach ($order_items as $item_id => $order_item) {
-                    $item_product   = $order_item->get_product();
-                    $item_active_price   = $item_product->get_price();
-                    $item_name = $order_item->get_name();
-                    $item_quantity = intval($order_item->get_quantity());
-                    $this->cartItems[] = [
-                        'name' => $item_name,
-                        'price' => $item_active_price,
-                        'quantity' => $item_quantity
-                    ];
-                }
+        // echo "<pre> xxxxxx";        print_r($order_items); echo "</pre>سسسسسسسسسسسسسسسسسسسسسسسسسسسسسسس"; 
+        if (!empty($order_items)) {
+            foreach ($order_items as $item_id => $order_item) {
+                $item_product   = $order_item->get_product();
+                $item_active_price   = $item_product->get_price();
+                $item_name = $order_item->get_name();
+                $item_quantity = intval($order_item->get_quantity());
+                $this->cartItems[] = [
+                    'name' => $item_name,
+                    'price' => $item_active_price,
+                    'quantity' => $item_quantity
+                ];
+             
+           
+            }
+          
 
+                 
+                
+            if ($order->get_total_shipping()) {
+                $this->cartItems[] = [
+                    "name" => 'Shipping fees',
+                    "price" => $order->get_total_shipping(),
+                    "quantity" => 1
+                ];
+            }
                 // Add discount
                 $discount_coupons = $woocommerce->cart->get_applied_coupons();
                 if (!empty($discount_coupons)) {
@@ -61,6 +75,7 @@ class FawaterkPayHelper
                     ];
                 }
             }
+        
 
             // Get mobile wallet number field
             $mobile_wallet_number = false;
@@ -82,6 +97,12 @@ class FawaterkPayHelper
             if (!$mobile_wallet_number) {
                 $mobile_wallet_number = $order->get_billing_phone() ? $order->get_billing_phone() : false;
             }
+
+
+            if ($this->order->get_total_shipping()) {
+                // $this->cartTotal = $this->order->get_total_shipping() + WC()->cart->cart_contents_total;
+            }
+
 
             $this->customer = [
                 "email"           => $order->get_billing_email() ? $order->get_billing_email() : 'none',
@@ -168,6 +189,7 @@ class FawaterkPayHelper
     public function requestOrder()
     {
 
+   
         $data = [
             "payment_method_id" => $this->payment_method_id,
             "cartTotal"         => $this->cartTotal,
@@ -175,16 +197,16 @@ class FawaterkPayHelper
             "currency"          => $this->order_currency,
             "customer"          => $this->customer,
             "redirectionUrls"   => $this->redirectionUrls,
-            "Total"         => $this->order->data['total'],
+            
         ];
-        // echo "<pre> xxxxxx";        print_r(); echo "</pre>"; 
+        echo "<pre> xxxxxx";        print_r($data); echo "</pre>"; 
         // "Total"         => $this->order->data['total'],
 // 
 
         // Chage $order to Response
         $this->response = $this->HttpPost($data);
 
-        echo "<pre> xxxxxx";        print_r( $this->response); echo "</pre>"; 
+        echo "<pre> xxxxxx";        print_r( $this->response); echo "</pre>";  die;
 
         if ($this->response) {
             if (isset($this->response['invoice_key'])) {

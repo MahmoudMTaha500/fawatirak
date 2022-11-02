@@ -240,8 +240,6 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
 
         $args['body'] = json_encode($payload);
-        // echo "<pre> xxxxxx";        print_r($args); echo "</pre>"; 
-        
 
         /*
         * Your API interaction could be built with wp_remote_post()
@@ -279,6 +277,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
             wc_add_notice('Connection error.', 'error');
             return;
         }
+       
 
     }
 
