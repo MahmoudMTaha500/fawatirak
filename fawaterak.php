@@ -148,7 +148,11 @@ function custom_available_payment_gateways($available_gateways)
 
     if (!is_wp_error($response)) {
 
+
         $raw_response =  json_decode($response['body'], true);
+// echo  WOOCOMMERCE_GATEWAY_FAWATERAK_URL;
+        // echo "<pre>";        print_r($raw_response); echo "</pre>";  die;
+
         include_once('methods/redirect_payments.php');
         include_once('methods/no_redirect_payments.php');
 
@@ -161,10 +165,10 @@ function custom_available_payment_gateways($available_gateways)
                 } elseif ($payment_option['name_en'] == 'mobile wallet' && $mobile_wallet_title) {
                     $get_payment_title = $mobile_wallet_title;
                 }
-                // echo "< pre>";        print_r($payment_method_registry); echo "</pre>";  die;
+                // echo "<pre>";        print_r($payment_method_registry); echo "</pre>";  die;
 
                 if ($payment_option['redirect'] === 'true') {
-                    $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
+                    $gateWay = new WC_Gateway_Fawaterk_Redirect_Payments($payment_option['paymentId'], $payment_option['logo'], $get_payment_title);
                     $available_gateways[$gateWay->id] = $gateWay;
                 // echo "<pre>";        print_r($gateWay); echo "</pre>";  die;
 
@@ -175,7 +179,7 @@ function custom_available_payment_gateways($available_gateways)
                     }
                     $available_gateways = [$gateWay->id => $gateWay] + $available_gateways;
                 } else {
-                    $gateWay = new WC_Gateway_Fawaterk_NO_Redirect_Payments($payment_option['paymentId'], WOOCOMMERCE_GATEWAY_FAWATERAK_URL . '/assets/images/' . $payment_option['paymentId'] . '.png', $get_payment_title);
+                    $gateWay = new WC_Gateway_Fawaterk_NO_Redirect_Payments($payment_option['paymentId'], $payment_option['logo'], $get_payment_title);
                     // $available_gateways[$gateWay->id] = $gateWay;
 
                     // Change gateway HTML id

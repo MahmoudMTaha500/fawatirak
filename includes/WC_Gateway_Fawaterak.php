@@ -240,7 +240,7 @@ class WC_Gateway_Fawaterak extends WC_Payment_Gateway
 
 
         $args['body'] = json_encode($payload);
-        echo "<pre> xxxxxx";        print_r($args); echo "</pre>"; 
+        // echo "<pre> xxxxxx";        print_r($args); echo "</pre>"; 
         
 
         /*
