@@ -73,7 +73,7 @@ function woocommerce_fawaterak_woocommerce_blocks_support()
 }
 
 
-add_filter('woocommerce_thankyou_order_received_text', 'woocommerce_fawaterk_modify_thank_you_text', 99999999, 2);
+// add_filter('woocommerce_thankyou_order_received_text', 'woocommerce_fawaterk_modify_thank_you_text', 99999999, 2);
 
 function woocommerce_fawaterk_modify_thank_you_text($str, $order)
 
