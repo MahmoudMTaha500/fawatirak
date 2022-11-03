@@ -28,7 +28,12 @@ class FawaterkPayHelper
         try {
             $order = $this->order;
             $return_url = $this->return_url;
-            $this->cartTotal = WC()->cart->cart_contents_total;
+            $shipping_value =0;
+             if( $order->get_total_shipping() ){
+                $shipping_value =  $order->get_total_shipping() ;
+             }
+
+            $this->cartTotal = WC()->cart->cart_contents_total + $shipping_value;
             $this->cartItems = [];
             // echo "<pre>";        print_r($this); echo "</pre>";  die;
 
@@ -102,8 +107,7 @@ class FawaterkPayHelper
             if ($this->order->get_total_shipping()) {
                 // $this->cartTotal = $this->order->get_total_shipping() + WC()->cart->cart_contents_total;
             }
-
-
+           
             $this->customer = [
                 "email"           => $order->get_billing_email() ? $order->get_billing_email() : 'none',
                 "first_name"      => $order->get_billing_first_name() ? $order->get_billing_first_name() : 'none',
@@ -112,10 +116,11 @@ class FawaterkPayHelper
                 // "phone"           => $order->get_billing_phone() ? $order->get_billing_phone(): '00000000000'
                 "phone" => $mobile_wallet_number ? $mobile_wallet_number : '00000000000'
             ];
-
+            $url_checkout =    wc_get_checkout_url();
+           
             $this->redirectionUrls = [
                 "successUrl"          => $return_url,
-                "failUrl"             => "https://www.google.com/",
+                "failUrl"             =>  $url_checkout,
                 "pendingUrl"          => $return_url
             ];
 
@@ -154,12 +159,12 @@ class FawaterkPayHelper
             $payment_data = $payment_data . $key . ': <b style="color:DodgerBlue;">' . $value . '</b> <br>';
         }
 
-        $this->order->update_status('pending-payment');
-        $this->order->add_order_note('(Awaiting Payment)' . '</br>' . ' Payment Data: <br>' . $payment_data);
-        $this->order->update_meta_data('payment_data', $this->response['payment_data']);
-        $this->order->update_meta_data('invoice_key', $this->response['invoice_key']);
-        $this->order->save();
-        $woocommerce->cart->empty_cart();
+        // $this->order->update_status('pending-payment');
+        // $this->order->add_order_note('(Awaiting Payment)' . '</br>' . ' Payment Data: <br>' . $payment_data);
+        // $this->order->update_meta_data('payment_data', $this->response['payment_data']);
+        // $this->order->update_meta_data('invoice_key', $this->response['invoice_key']);
+        // $this->order->save();
+        // $woocommerce->cart->empty_cart();
     }
 
     public function getError()
@@ -197,16 +202,18 @@ class FawaterkPayHelper
             "currency"          => $this->order_currency,
             "customer"          => $this->customer,
             "redirectionUrls"   => $this->redirectionUrls,
+            // "mobileWalletNumber"   => $this->redirectionUrls,
+
             
         ];
-        echo "<pre> xxxxxx";        print_r($data); echo "</pre>"; 
+        // echo "<pre> xxxxxx";        print_r(  $data); echo "</pre>"; 
         // "Total"         => $this->order->data['total'],
 // 
 
         // Chage $order to Response
         $this->response = $this->HttpPost($data);
 
-        echo "<pre> xxxxxx";        print_r( $this->response); echo "</pre>";  die;
+        // echo "<pre> xxxxxx";        print_r( $this->response); echo "</pre>";  die;
 
         if ($this->response) {
             if (isset($this->response['invoice_key'])) {
