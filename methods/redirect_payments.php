@@ -69,11 +69,15 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
         }
     //   die;
     // echo "<pre> order arrrrrrrrrrrrrrrryyyyyyyyy";        print_r($order); echo "</pre>";  die;
+            if($payment_data['redirectTo']=="successUrl"){
+                $process->processOrder();
 
-        $process->processOrder();
+            } 
+
+    return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
+        
             
         
-        return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
     }
 
     public function payment_fields()

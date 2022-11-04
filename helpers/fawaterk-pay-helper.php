@@ -159,12 +159,13 @@ class FawaterkPayHelper
             $payment_data = $payment_data . $key . ': <b style="color:DodgerBlue;">' . $value . '</b> <br>';
         }
 
-        // $this->order->update_status('pending-payment');
-        // $this->order->add_order_note('(Awaiting Payment)' . '</br>' . ' Payment Data: <br>' . $payment_data);
-        // $this->order->update_meta_data('payment_data', $this->response['payment_data']);
-        // $this->order->update_meta_data('invoice_key', $this->response['invoice_key']);
-        // $this->order->save();
-        // $woocommerce->cart->empty_cart();
+        $this->order->update_status('pending-payment');
+        $this->order->add_order_note('(Awaiting Payment)' . '</br>' . ' Payment Data: <br>' . $payment_data);
+        $this->order->update_meta_data('payment_data', $this->response['payment_data']);
+        $this->order->update_meta_data('invoice_key', $this->response['invoice_key']);
+        $this->order->save();
+        $woocommerce->cart->empty_cart();
+        return false;
     }
 
     public function getError()
