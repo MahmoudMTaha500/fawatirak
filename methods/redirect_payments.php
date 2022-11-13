@@ -72,9 +72,14 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             if($payment_data['redirectTo']=="successUrl"){
                 $process->processOrder();
 
-            } 
+            }  else {
+                wc_add_notice( __('Payment failed :', 'woothemes') . $error_message, 'error' );
+            // return $error_message;
 
-    return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
+            }
+            return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
+
+
         
             
         

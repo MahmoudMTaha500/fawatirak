@@ -32,6 +32,10 @@ class FawaterkPayHelper
              if( $order->get_total_shipping() ){
                 $shipping_value =  $order->get_total_shipping() ;
              }
+             $discount_value = 0;
+             if($order->get_total_discount()){
+                $discount_value = $order->get_total_discount();
+             }
 
             $this->cartTotal = WC()->cart->cart_contents_total + $shipping_value;
             $this->cartItems = [];
@@ -43,7 +47,6 @@ class FawaterkPayHelper
              * @since 1.2.4
              */
             $order_items = $order->get_items();
-        // echo "<pre> xxxxxx";        print_r($order_items); echo "</pre>سسسسسسسسسسسسسسسسسسسسسسسسسسسسسسس"; 
         if (!empty($order_items)) {
             foreach ($order_items as $item_id => $order_item) {
                 $item_product   = $order_item->get_product();
@@ -61,7 +64,9 @@ class FawaterkPayHelper
           
 
                  
-                
+        // echo "<pre> xxxxxx";        print_r(-$order->get_total_discount()); echo "</pre>";  die;
+       
+
             if ($order->get_total_shipping()) {
                 $this->cartItems[] = [
                     "name" => 'Shipping fees',
@@ -207,7 +212,7 @@ class FawaterkPayHelper
 
             
         ];
-        // echo "<pre> xxxxxx";        print_r(  $data); echo "</pre>"; 
+        // echo "<pre> xxxxxx";        print_r(  $data); echo "</pre>"; die;
         // "Total"         => $this->order->data['total'],
 // 
 

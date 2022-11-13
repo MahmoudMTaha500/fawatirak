@@ -71,7 +71,34 @@ function woocommerce_fawaterak_woocommerce_blocks_support()
     }
 
 }
+add_action( 'template_redirect', 'order_received_redirection_to_my_account' );
+function order_received_redirection_to_my_account() {
+    // Only on "Order received" page
+    if( is_wc_endpoint_url('order-received') ) {
+        global $wp;
 
+        // HERE below define your product categories in the array
+        $categories = array('Tshirts', 'Hoodies', 'Glasses');
+
+        $order = wc_get_order( absint($wp->query_vars['order-received']) ); // Get the Order Object
+        $category_found = false;
+
+        // Loop theough order items
+        foreach( $order->get_items() as $item ){
+            if( has_term( $categories, 'product_cat', $item->get_product_id() ) ) {
+                $category_found = true;
+                break;
+            }
+        }
+
+        if( $category_found ) {
+            // My account redirection url
+            $my_account_redirect_url = get_permalink( get_option('woocommerce_myaccount_page_id') );
+            wp_redirect( $my_account_redirect_url );
+            exit(); // Always exit
+        }
+    }
+}
 
 add_filter('woocommerce_thankyou_order_received_text', 'woocommerce_fawaterk_modify_thank_you_text', 99999999, 2);
 
@@ -85,11 +112,16 @@ function woocommerce_fawaterk_modify_thank_you_text($str, $order)
             // print_r($payment_method_id);die;
     $new_str = '';
     if ($payment_method_id === 'fawaterk_3') {
+        $labels = [
+            'fawaterk_3_desc' => get_locale() === 'ar' ?  __('برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع  من خلال رقم الخدمه 788', 'fawaterk') : __('Please go to the nearest Fawry machine and complete the payment process through the service number', 'fawaterk'),
+            'fawaterk_3_Refrence_Number' => get_locale() === 'ar' ?  __(' الرقم المرجعي لفوري ', 'fawaterk') : __('Fawry Refrence Number:', 'fawaterk'),
+            'fawaterk_3_ExpirationDate' => get_locale() === 'ar' ?  __(' تاريخ انتهاء صلاحية فوري ', 'fawaterk') : __('Fawry Expiration Date:', 'fawaterk'),
+        ];
         // Fawry payment message
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Fawry machine and complete the payment process.</Strong>' . '<br><br>';
-        $new_str .= '<br>' . '<Strong style="font-size:20px;">Fawry Refrence Number: </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['fawryCode'] . '</span>';
-        $new_str .= '<br>' . '<Strong style="font-size:20px;">Fawry Expiration Date: </Strong> <span style="font-size: 20px;background: red;padding: 0 5px;font-weight: bold;color: aliceblue;"> ' . $payment_data['expireDate'] . '</span>';
-        $new_str .= '<br>' . '<Strong>برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع  من خلال رقم الخدمه 788</strong>';
+        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_Refrence_Number'].' </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['fawryCode'] . '</span>';
+        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_ExpirationDate'].' </Strong> <span style="font-size: 20px;background: red;padding: 0 5px;font-weight: bold;color: aliceblue;"> ' . $payment_data['expireDate'] . '</span>';
+        $new_str .= '<br>' . '<Strong> '.  $labels['fawaterk_3_desc'] .'<strong>';
     } elseif ($payment_method_id === 'fawaterk_4') {
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, You will receive a message on the wallet number with how to complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong>ستصلك رسالة على رقم المحفظة بكيفية إتمام عملية الدفع</strong>';
