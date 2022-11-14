@@ -113,15 +113,17 @@ function woocommerce_fawaterk_modify_thank_you_text($str, $order)
     $new_str = '';
     if ($payment_method_id === 'fawaterk_3') {
         $labels = [
-            'fawaterk_3_desc' => get_locale() === 'ar' ?  __('برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع  من خلال رقم الخدمه 788', 'fawaterk') : __('Please go to the nearest Fawry machine and complete the payment process through the service number', 'fawaterk'),
+            'fawaterk_3_desc' => get_locale() === 'ar' ?  __('برجاء التوجة إلى أقرب ماكينة فوري وإتمام عملية الدفع  من خلال رقم الخدمه 788', 'fawaterk') : __('Kindly note that your order is pending untill you complete the payment', 'fawaterk'),
             'fawaterk_3_Refrence_Number' => get_locale() === 'ar' ?  __(' الرقم المرجعي لفوري ', 'fawaterk') : __('Fawry Refrence Number:', 'fawaterk'),
             'fawaterk_3_ExpirationDate' => get_locale() === 'ar' ?  __(' تاريخ انتهاء صلاحية فوري ', 'fawaterk') : __('Fawry Expiration Date:', 'fawaterk'),
+            'fawaterk_3_meg' => get_locale() === 'ar' ?  __('    شكرا لك. عمليه الدفع متوقفه الان برجاء التوجه اللي اقر ماكينه دفع فوري و اكمل عمليه الدفع ', 'fawaterk') : __('Thank you. Payment is pending, Please go to the nearest Fawry machine and complete the payment process.:', 'fawaterk'),
         ];
         // Fawry payment message
-        $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, Please go to the nearest Fawry machine and complete the payment process.</Strong>' . '<br><br>';
-        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_Refrence_Number'].' </Strong> <span style="font-size: 20px;background: green;padding: 0 5px;font-weight: bold;color: aliceblue;">' . $payment_data['fawryCode'] . '</span>';
-        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_ExpirationDate'].' </Strong> <span style="font-size: 20px;background: red;padding: 0 5px;font-weight: bold;color: aliceblue;"> ' . $payment_data['expireDate'] . '</span>';
-        $new_str .= '<br>' . '<Strong> '.  $labels['fawaterk_3_desc'] .'<strong>';
+        $new_str .= '<br>' . '<Strong><span style="font-size: 20px;color: red;padding: 0 5px;font-weight: bold;"> '.  $labels['fawaterk_3_desc'] .' </span><strong>';
+
+        // $new_str .= '<br>' . '<Strong> <span style="font-size: 20px;color: red;padding: 0 5px;font-weight: bold;">' .  $labels['fawaterk_3_meg'].' </span></Strong>' . '<br>';
+        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_Refrence_Number'].' </Strong> <span style="font-size: 25px;color: green;padding: 0 5px;font-weight: bold;">' . $payment_data['fawryCode'] . '</span>';
+        $new_str .= '<br>' . '<Strong style="font-size:20px;">' .  $labels['fawaterk_3_ExpirationDate'].' </Strong> <span style="font-size: 20px;color: red;padding: 0 5px;font-weight: bold;"> ' . $payment_data['expireDate'] . '</span>';
     } elseif ($payment_method_id === 'fawaterk_4') {
         $new_str .= '<br><br>' . '<Strong>Thank you. Payment is pending, You will receive a message on the wallet number with how to complete the payment process.</Strong>' . '<br><br>';
         $new_str .= '<br>' . '<Strong>ستصلك رسالة على رقم المحفظة بكيفية إتمام عملية الدفع</strong>';
