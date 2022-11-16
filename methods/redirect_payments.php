@@ -47,7 +47,7 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             "payment_method_id" => $this->payment_method_id,
         ];
         $return_url = WC_Payment_Gateway::get_return_url( $order );
-        // echo "<pre>ءءء";        print_r($return_url); echo "</pre>";  
+       
 
 
         $process = new FawaterkPayHelper($order, $config, $return_url , $order);
@@ -62,22 +62,41 @@ class WC_Gateway_Fawaterk_Redirect_Payments extends WC_Payment_Gateway
             throw new Exception("Failed to register order.");
         }
         $payment_data = $process->getPaymentData();
-        // echo "<pre>";        print_r($payment_data); echo "</pre>";  die;
+
+        // $InvoiveData = $process->CheckOrderPaiedOrNot();
+    // echo "<pre>";        print_r($InvoiveData); echo "</pre>";  
+    // echo "<pre>";        print_r($payment_data); echo "</pre>";  
+
 
         if (!$payment_data) {
             throw new Exception("Failed to Get Payment Data.");
         }
-    //   die;
-    // echo "<pre> order arrrrrrrrrrrrrrrryyyyyyyyy";        print_r($order); echo "</pre>";  die;
-            if($payment_data['redirectTo']=="successUrl"){
-                $process->processOrder();
+   
+ 
+        // $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";  
+        // $CurPageURL = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];  
+        // echo "The URL of current page: ".$CurPageURL;  die;
+  if( wc_get_checkout_url()){
+    wc_add_notice( __('Payment failed Please Try Again  :', 'woothemes') . $error_message, 'error' );
+     
+  } else{
+    $process->processOrder();
+    return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
+  }
+
+
+            if($payment_data){
+                // $process->processOrder();
 
             }  else {
-                wc_add_notice( __('Payment failed :', 'woothemes') . $error_message, 'error' );
+                  wc_add_notice( __('Payment failed Please Try Again  :', 'woothemes') . $error_message, 'error' );
+               
             // return $error_message;
 
             }
+        
             return ['result' => 'success', 'redirect' => $payment_data['redirectTo']];
+        
 
 
         

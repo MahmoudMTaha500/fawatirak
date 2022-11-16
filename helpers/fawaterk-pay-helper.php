@@ -1,7 +1,9 @@
 <?php
 class FawaterkPayHelper
 {
+    public $invoice_id;
     const HOST = FAWATERK_ENABLE_STAGING ? 'https://fawaterkstage.com/api/v2/invoiceInitPay' : "https://app.fawaterk.com/api/v2/invoiceInitPay";
+    const HOST_Check_url ="https://fawaterkstage.com/api/v2/getInvoiceData/" ;
 
     public function __construct(WC_Order $order, array $config, $return_url, $get_order = false)
     {
@@ -39,7 +41,7 @@ class FawaterkPayHelper
 
             $this->cartTotal = WC()->cart->cart_contents_total + $shipping_value;
             $this->cartItems = [];
-            // echo "<pre>";        print_r($this); echo "</pre>";  die;
+       
 
             /**
              * Updating order items list
@@ -61,10 +63,7 @@ class FawaterkPayHelper
              
            
             }
-          
 
-                 
-        // echo "<pre> xxxxxx";        print_r(-$order->get_total_discount()); echo "</pre>";  die;
        
 
             if ($order->get_total_shipping()) {
@@ -128,6 +127,7 @@ class FawaterkPayHelper
                 "failUrl"             =>  $url_checkout,
                 "pendingUrl"          => $return_url
             ];
+     
 
             $this->processStoreConfig();
         } catch (\Exception $error) {
@@ -224,6 +224,8 @@ class FawaterkPayHelper
         if ($this->response) {
             if (isset($this->response['invoice_key'])) {
                 // Return the invoice Key
+                $this->invoice_id = $this->response['invoice_id'];
+
                 return $this->response['invoice_key'];
             }
         }
@@ -233,14 +235,22 @@ class FawaterkPayHelper
 
     public function getPaymentData()
     {
+        // echo "<pre> ءءء";        print_r($this->response['payment_data']); echo "</pre>";  die;
+
         if ($this->response) {
+
             return $this->response['payment_data'];
         }
 
         return false;
     }
 
+   public function CheckOrderPaiedOrNot(){
+    $data=[];
+    $request = $this->Check_invoice($data);
 
+
+   }
     public function requestWalletUrl($phone_number)
     {
         $data = [
@@ -279,6 +289,44 @@ class FawaterkPayHelper
             ]
         );
 
+
+        if (is_wp_error($response)) {
+            $this->error = $response->get_error_message();
+        }
+
+        $this->response_raw_data = json_decode($response['body'], true);
+
+
+        if ($this->response_raw_data['status'] === 'error') {
+            $this->error = $this->response_raw_data['message'];
+            throw new Exception($this->getError());
+        }
+        return $this->response_raw_data['data'];
+    }
+
+    private function Check_invoice($data = [])
+    {
+        $response = wp_remote_post(
+            "https://fawaterkstage.com/api/v2/getInvoiceData/$this->invoice_id",
+            [
+                'method' => 'GET',
+                'timeout' => 90,
+                'sslverify' => false,
+                'redirection' => 10,
+                'httpversion' => '2',
+                'blocking' => true,
+                'headers' => [
+                    "Content-Type" => "application/json",
+                    "Authorization" => "Bearer $this->api_key"
+                ],
+               
+            ]
+        );
+        // echo $_SERVER['REQUEST_URI'];
+        echo $_SERVER['HTTP_REFERER'];
+   
+        // echo get_site_url();
+        echo "<pre> response";        print_r(  $response); echo "</pre>"; die;
 
         if (is_wp_error($response)) {
             $this->error = $response->get_error_message();
